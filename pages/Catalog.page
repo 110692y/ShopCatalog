@@ -1,0 +1,89 @@
+<apex:page controller="CatalogController" showHeader="false">
+    <head>
+        <style>
+            #itemGrid {
+                margin: auto auto;
+            }
+
+            table, tr, td {
+                border: 1px solid black;
+            }
+
+            .cart {
+                border: 1px solid darkslategray;
+                background-color: whitesmoke;
+            }
+
+            .cart tr {
+                height: 30px;
+            }
+        </style>
+    </head>
+    <body>
+    <apex:form>
+
+
+
+        <div id="cartDiv" style="position: absolute;top:0;right:0; width: 25%;">
+            <apex:image url="https://cdn3.iconfinder.com/data/icons/ikooni-flat-online-shopping/128/shopping-14-128.png"
+                        width="15px">
+                <apex:actionSupport action="{!hideCart}" event="onmouseout"></apex:actionSupport>
+                <apex:actionSupport action="{!showCart}" event="onmouseover"></apex:actionSupport>
+            </apex:image>
+
+            <apex:outputPanel layout="block" id="outText">
+                <apex:outputText value="Cart is Empty" rendered="{!emptyCart}"/>
+                <apex:outputText value="Show Cart" rendered="{! !emptyCart}">
+                </apex:outputText>
+            </apex:outputPanel>
+            <apex:dataTable styleClass="cart" id="cart" value="{!cartItems}" var="cartItem" width="100%"
+                            rendered="{!seeCart=true}">
+                <apex:column width="60%" value="{!cartItem.Shop_Item__r.Name}"></apex:column>
+                <apex:column width="7%" value="{!cartItem.Amount__c}"></apex:column>
+                <apex:column width="33%" value="{!cartItem.Sum__c}"></apex:column>
+            </apex:dataTable>
+        </div>
+
+        <div id="itemGrid" style="width: 40%; background-color: lavender;">
+
+            <center>
+                <apex:commandButton rendered="{!!newOrder}" value="New Order"
+                                    action="{!createNewOrder}"></apex:commandButton>
+            </center>
+            <br/>
+            <apex:repeat value="{!shopItems}" var="item" rendered="{!newOrder}">
+                <apex:outputPanel>
+                    <table style="border-collapse: collapse; ">
+                        <tr border="1px solid black;">
+                            <td rowspan="4" align="center" width="100px;">
+                                <apex:image url="{!item.ImageURL__c}" width="100px;"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Name:</b></td>
+                            <td>{!item.Name}</td>
+                            <td rowspan="3" align="center" width="100px;">
+                                <apex:outputPanel><a
+                                        href="javascript:if (window.confirm('Add?')) addToCart('{!item.Id}');">Add »</a>
+                                </apex:outputPanel>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Price:</b></td>
+                            <td>{!item.Price__c}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Description:</b></td>
+                            <td>{!item.Description__c}</td>
+                        </tr>
+                    </table>
+                </apex:outputPanel>
+            </apex:repeat>
+            <apex:actionFunction action="{!addToCart}" name="addToCart" reRender="cart,itemGrid, outText">
+                <apex:param name="id" value="" assignTo="{!selectedItem}"/>
+            </apex:actionFunction>
+
+        </div>
+    </apex:form>
+    </body>
+</apex:page>
